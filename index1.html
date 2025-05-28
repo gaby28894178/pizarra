@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Generador de Tabla de Verdad</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <!-- <style>
+    .logic-card {
+      transition: transform 0.3s ease;
+    }
+    .logic-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .table-responsive {
+      max-height: 70vh;
+    }
+    .symbol {
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+    }
+    .input-group-prepend .input-group-text {
+      min-width: 40px;
+      justify-content: center;
+    }
+    .truth-value {
+      font-weight: bold;
+      text-align: center;
+    }
+    .truth-value.true {
+      color: #198754;
+    }
+    .truth-value.false {
+      color: #dc3545;
+    }
+    .operation-example {
+      font-family: 'Courier New', monospace;
+      background-color: #f8f9fa;
+      padding: 2px 5px;
+      border-radius: 3px;
+    }
+  </style> -->
+</head>
+<body class="bg-light">
+  <div class="container py-5">
+    <!-- Header -->
+    <header class="text-center mb-5">
+      <h1 class="display-4 fw-bold text-primary">
+        <i class="bi bi-table"></i> Generador de Tabla de Verdad
+      </h1>
+      <p class="lead">Herramienta para análisis de proposiciones lógicas</p>
+    </header>
+
+    <div class="row">
+      <!-- Input Section -->
+      <div class="col-lg-8 mx-auto" id="input-section">
+        <div class="card shadow-sm mb-4">
+          <div class="card-header bg-primary text-white">
+            <h2 class="h5 mb-0"><i class="bi bi-input-cursor-text"></i> Ingrese valores</h2>
+          </div>
+          <div class="card-body">
+            <p class="text-center mb-4">Ingrese los valores de verdad (V/F) para cada proposición:</p>
+            
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="input-group mb-3">
+                  <span class="input-group-text bg-primary text-white">P</span>
+                  <input type="text" class="form-control text-center text-uppercase" id="p" maxlength="1" placeholder="V o F">
+                  <div class="invalid-feedback" id="p-error">Debe ser V o F</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="input-group mb-3">
+                  <span class="input-group-text bg-primary text-white">Q</span>
+                  <input type="text" class="form-control text-center text-uppercase" id="q" maxlength="1" placeholder="V o F">
+                  <div class="invalid-feedback" id="q-error">Debe ser V o F</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="input-group mb-3">
+                  <span class="input-group-text bg-primary text-white">R</span>
+                  <input type="text" class="form-control text-center text-uppercase" id="r" maxlength="1" placeholder="V o F">
+                  <div class="invalid-feedback" id="r-error">Debe ser V o F</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="input-group mb-3">
+                  <span class="input-group-text bg-primary text-white">S</span>
+                  <input type="text" class="form-control text-center text-uppercase" id="s" maxlength="1" placeholder="V o F">
+                  <div class="invalid-feedback" id="s-error">Debe ser V o F</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="d-grid gap-2 mt-3">
+              <button class="btn btn-primary btn-lg" onclick="generarTabla()">
+                <i class="bi bi-table"></i> Generar Tabla de Verdad
+              </button>
+            </div>
+            
+            <div class="alert alert-info mt-4">
+              <i class="bi bi-info-circle"></i> <strong>Nota:</strong> Deje en blanco para generar todas las combinaciones posibles.
+            </div>
+          </div>
+        </div>
+
+        <!-- Student Info -->
+        <div class="card shadow-sm mb-4 logic-card">
+          <div class="card-header bg-success text-white">
+            <h2 class="h5 mb-0"><i class="bi bi-person-badge"></i> Datos del Alumno</h2>
+          </div>
+          <div class="card-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item"><strong>Nombre:</strong> Gabriel</li>
+              <li class="list-group-item"><strong>Curso:</strong> Lógica computacional</li>
+              <li class="list-group-item"><strong>Tema:</strong> Tablas de verdad</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Symbols and Info -->
+      <div class="col-lg-8 mx-auto">
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="card shadow-sm h-100 logic-card">
+              <div class="card-header bg-warning text-dark">
+                <h2 class="h5 mb-0"><i class="bi bi-signpost-split"></i> Significados de los símbolos</h2>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Símbolo</th>
+                        <th>Nombre</th>
+                        <th>Significado</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td class="symbol">¬</td>
+                        <td>Negación</td>
+                        <td>Cambia el valor de verdad</td>
+                      </tr>
+                      <tr>
+                        <td class="symbol">∧</td>
+                        <td>Conjunción</td>
+                        <td>"Y" lógico (ambas verdaderas)</td>
+                      </tr>
+                      <tr>
+                        <td class="symbol">∨</td>
+                        <td>Disyunción</td>
+                        <td>"O" lógico (al menos una verdadera)</td>
+                      </tr>
+                      <tr>
+                        <td class="symbol">→</td>
+                        <td>Implicación</td>
+                        <td>"Si... entonces..." (condicional)</td>
+                      </tr>
+                      <tr>
+                        <td class="symbol">↔</td>
+                        <td>Bicondicional</td>
+                        <td>"Si y solo si" (equivalencia)</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="card shadow-sm h-100 logic-card">
+              <div class="card-header bg-info text-white">
+                <h2 class="h5 mb-0"><i class="bi bi-lightbulb"></i> Ejemplos de operaciones</h2>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Operación</th>
+                        <th>Ejemplo</th>
+                        <th>Resultado</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Negación</td>
+                        <td class="operation-example">¬V</td>
+                        <td><span class="truth-value false">F</span></td>
+                      </tr>
+                      <tr>
+                        <td>Conjunción</td>
+                        <td class="operation-example">V ∧ F</td>
+                        <td><span class="truth-value false">F</span></td>
+                      </tr>
+                      <tr>
+                        <td>Disyunción</td>
+                        <td class="operation-example">V ∨ F</td>
+                        <td><span class="truth-value true">V</span></td>
+                      </tr>
+                      <tr>
+                        <td>Implicación</td>
+                        <td class="operation-example">V → F</td>
+                        <td><span class="truth-value false">F</span></td>
+                      </tr>
+                      <tr>
+                        <td>Bicondicional</td>
+                        <td class="operation-example">V ↔ V</td>
+                        <td><span class="truth-value true">V</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="alert alert-secondary mt-3">
+                  <i class="bi bi-journal-text"></i> <strong>Observación:</strong> Este generador permite visualizar combinaciones lógicas básicas usando hasta cuatro proposiciones (P, Q, R, S).
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Result Section -->
+    <div class="row mt-4 d-none" id="result-section">
+      <div class="col-12">
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white">
+            <h2 class="h4 mb-0"><i class="bi bi-table"></i> Tabla de Verdad Generada</h2>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <div id="tabla-container"></div>
+            </div>
+            <div class="d-grid gap-2 mt-3">
+              <button class="btn btn-outline-primary" onclick="volver()">
+                <i class="bi bi-arrow-left"></i> Volver
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    // Validación de entrada
+    function validarEntrada(valor) {
+      return valor === '' || valor.toUpperCase() === 'V' || valor.toUpperCase() === 'F';
+    }
+
+    // Generar tabla de verdad
+    function generarTabla() {
+      // Obtener valores
+      const p = document.getElementById('p').value.toUpperCase();
+      const q = document.getElementById('q').value.toUpperCase();
+      const r = document.getElementById('r').value.toUpperCase();
+      const s = document.getElementById('s').value.toUpperCase();
+      
+      // Validar entradas
+      let valido = true;
+      const inputs = ['p', 'q', 'r', 's'];
+      
+      inputs.forEach(id => {
+        const input = document.getElementById(id);
+        const error = document.getElementById(`${id}-error`);
+        
+        if (!validarEntrada(input.value)) {
+          input.classList.add('is-invalid');
+          error.style.display = 'block';
+          valido = false;
+        } else {
+          input.classList.remove('is-invalid');
+          error.style.display = 'none';
+        }
+      });
+      
+      if (!valido) return;
+      
+      // Generar combinaciones
+      const combinaciones = generarCombinaciones(p, q, r, s);
+      
+      // Crear tabla HTML
+      let tablaHTML = `
+        <table class="table table-bordered table-hover">
+          <thead class="table-primary">
+            <tr>
+              <th>P</th>
+              <th>Q</th>
+              <th>R</th>
+              <th>S</th>
+              <th>¬P</th>
+              <th>¬Q</th>
+              <th>P ∧ Q</th>
+              <th>P ∨ Q</th>
+              <th>P → Q</th>
+              <th>P ↔ Q</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      
+      // Llenar tabla con datos
+      combinaciones.forEach(([P, Q, R, S]) => {
+        const rowClass = P === 'V' && Q === 'V' ? 'table-success' : '';
+        tablaHTML += `
+          <tr class="${rowClass}">
+            <td class="truth-value ${P === 'V' ? 'true' : 'false'}">${P}</td>
+            <td class="truth-value ${Q === 'V' ? 'true' : 'false'}">${Q}</td>
+            <td class="truth-value ${R === 'V' ? 'true' : 'false'}">${R}</td>
+            <td class="truth-value ${S === 'V' ? 'true' : 'false'}">${S}</td>
+            <td class="truth-value ${negacion(P) === 'V' ? 'true' : 'false'}">${negacion(P)}</td>
+            <td class="truth-value ${negacion(Q) === 'V' ? 'true' : 'false'}">${negacion(Q)}</td>
+            <td class="truth-value ${conjuncion(P, Q) === 'V' ? 'true' : 'false'}">${conjuncion(P, Q)}</td>
+            <td class="truth-value ${disyuncion(P, Q) === 'V' ? 'true' : 'false'}">${disyuncion(P, Q)}</td>
+            <td class="truth-value ${implicacion(P, Q) === 'V' ? 'true' : 'false'}">${implicacion(P, Q)}</td>
+            <td class="truth-value ${bicondicional(P, Q) === 'V' ? 'true' : 'false'}">${bicondicional(P, Q)}</td>
+          </tr>
+        `;
+      });
+      
+      tablaHTML += `</tbody></table>`;
+      
+      // Mostrar resultados
+      document.getElementById('tabla-container').innerHTML = tablaHTML;
+      document.getElementById('input-section').classList.add('d-none');
+      document.getElementById('result-section').classList.remove('d-none');
+      
+      // Scroll a resultados
+      document.getElementById('result-section').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Generar combinaciones posibles
+    function generarCombinaciones(p, q, r, s) {
+      const valores = ['V', 'F'];
+      const combinaciones = [];
+      
+      // Determinar qué variables tienen valores fijos
+      const pFijo = p !== '';
+      const qFijo = q !== '';
+      const rFijo = r !== '';
+      const sFijo = s !== '';
+      
+      // Generar combinaciones basadas en qué variables están fijas
+      for (const vp of pFijo ? [p] : valores) {
+        for (const vq of qFijo ? [q] : valores) {
+          for (const vr of rFijo ? [r] : valores) {
+            for (const vs of sFijo ? [s] : valores) {
+              combinaciones.push([vp, vq, vr, vs]);
+            }
+          }
+        }
+      }
+      
+      return combinaciones;
+    }
+
+    // Operaciones lógicas
+    function negacion(valor) {
+      return valor === 'V' ? 'F' : 'V';
+    }
+
+    function conjuncion(a, b) {
+      return a === 'V' && b === 'V' ? 'V' : 'F';
+    }
+
+    function disyuncion(a, b) {
+      return a === 'V' || b === 'V' ? 'V' : 'F';
+    }
+
+    function implicacion(a, b) {
+      return a === 'V' && b === 'F' ? 'F' : 'V';
+    }
+
+    function bicondicional(a, b) {
+      return a === b ? 'V' : 'F';
+    }
+
+    // Volver al formulario
+    function volver() {
+      document.getElementById('input-section').classList.remove('d-none');
+      document.getElementById('result-section').classList.add('d-none');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Validación en tiempo real
+    document.querySelectorAll('input').forEach(input => {
+      input.addEventListener('input', function() {
+        if (this.value !== '' && !validarEntrada(this.value)) {
+          this.classList.add('is-invalid');
+          document.getElementById(`${this.id}-error`).style.display = 'block';
+        } else {
+          this.classList.remove('is-invalid');
+          document.getElementById(`${this.id}-error`).style.display = 'none';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

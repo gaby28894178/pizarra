@@ -1,409 +1,464 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Generador de Tabla de Verdad</title>
-  <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Bootstrap Icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-  <!-- <style>
-    .logic-card {
-      transition: transform 0.3s ease;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Canvas con herramientas</title>
+  <!-- Font Awesome para iconos -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Estilo similar a Tailwind -->
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --secondary: #6b7280;
+      --dark: #1f2937;
+      --light: #f9fafb;
+      --danger: #ef4444;
+      --success: #10b981;
     }
-    .logic-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f3f4f6;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
-    .table-responsive {
-      max-height: 70vh;
+    
+    /* Navbar estilo Bootstrap */
+    .navbar {
+      background-color: var(--dark);
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    .symbol {
-      font-family: 'Courier New', monospace;
+    
+    .navbar-brand {
+      font-size: 1.5rem;
       font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
-    .input-group-prepend .input-group-text {
-      min-width: 40px;
-      justify-content: center;
+    
+    .navbar-nav {
+      display: flex;
+      gap: 1.5rem;
     }
-    .truth-value {
-      font-weight: bold;
+    
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    
+    .nav-link:hover {
+      color: var(--primary);
+    }
+    
+    /* Contenido principal */
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      flex: 1;
+    }
+    
+    .card {
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+    }
+    
+    h1 {
+      color: var(--dark);
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    /* Toolbar estilo moderno */
+    #toolbar {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+      align-items: center;
+    }
+    
+    .tool-btn {
+      background-color: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.375rem;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+    
+    .tool-btn:hover {
+      background-color: #f3f4f6;
+      border-color: #d1d5db;
+    }
+    
+    .tool-btn.active {
+      background-color: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    
+    select, input, button {
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.375rem;
+      border: 1px solid #e5e7eb;
+      font-size: 0.875rem;
+    }
+    
+    button {
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    button.primary {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+    }
+    
+    button.primary:hover {
+      background-color: #2563eb;
+    }
+    
+    button.danger {
+      background-color: var(--danger);
+      color: white;
+      border: none;
+    }
+    
+    button.danger:hover {
+      background-color: #dc2626;
+    }
+    
+    /* Canvas */
+    canvas {
+      border: 1px solid #e5e7eb;
+      border-radius: 0.375rem;
+      background-color: white;
+      width: 100%;
+      max-width: 800px;
+      height: 600px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    
+    /* Footer */
+    footer {
+      background-color: var(--dark);
+      color: white;
+      padding: 1.5rem;
       text-align: center;
+      margin-top: auto;
     }
-    .truth-value.true {
-      color: #198754;
+    
+    .footer-content {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
     }
-    .truth-value.false {
-      color: #dc3545;
+    
+    .social-link {
+      color: white;
+      font-size: 1.25rem;
+      transition: color 0.2s;
     }
-    .operation-example {
-      font-family: 'Courier New', monospace;
-      background-color: #f8f9fa;
-      padding: 2px 5px;
-      border-radius: 3px;
+    
+    .social-link:hover {
+      color: var(--primary);
     }
-  </style> -->
+  </style>
 </head>
-<body class="bg-light">
-  <div class="container py-5">
-    <!-- Header -->
-    <header class="text-center mb-5">
-      <h1 class="display-4 fw-bold text-primary">
-        <i class="bi bi-table"></i> Generador de Tabla de Verdad
-      </h1>
-      <p class="lead">Herramienta para análisis de proposiciones lógicas</p>
-    </header>
-
-    <div class="row">
-      <!-- Input Section -->
-      <div class="col-lg-8 mx-auto" id="input-section">
-        <div class="card shadow-sm mb-4">
-          <div class="card-header bg-primary text-white">
-            <h2 class="h5 mb-0"><i class="bi bi-input-cursor-text"></i> Ingrese valores</h2>
-          </div>
-          <div class="card-body">
-            <p class="text-center mb-4">Ingrese los valores de verdad (V/F) para cada proposición:</p>
-            
-            <div class="row g-3">
-              <div class="col-md-6">
-                <div class="input-group mb-3">
-                  <span class="input-group-text bg-primary text-white">P</span>
-                  <input type="text" class="form-control text-center text-uppercase" id="p" maxlength="1" placeholder="V o F">
-                  <div class="invalid-feedback" id="p-error">Debe ser V o F</div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="input-group mb-3">
-                  <span class="input-group-text bg-primary text-white">Q</span>
-                  <input type="text" class="form-control text-center text-uppercase" id="q" maxlength="1" placeholder="V o F">
-                  <div class="invalid-feedback" id="q-error">Debe ser V o F</div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="input-group mb-3">
-                  <span class="input-group-text bg-primary text-white">R</span>
-                  <input type="text" class="form-control text-center text-uppercase" id="r" maxlength="1" placeholder="V o F">
-                  <div class="invalid-feedback" id="r-error">Debe ser V o F</div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="input-group mb-3">
-                  <span class="input-group-text bg-primary text-white">S</span>
-                  <input type="text" class="form-control text-center text-uppercase" id="s" maxlength="1" placeholder="V o F">
-                  <div class="invalid-feedback" id="s-error">Debe ser V o F</div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="d-grid gap-2 mt-3">
-              <button class="btn btn-primary btn-lg" onclick="generarTabla()">
-                <i class="bi bi-table"></i> Generar Tabla de Verdad
-              </button>
-            </div>
-            
-            <div class="alert alert-info mt-4">
-              <i class="bi bi-info-circle"></i> <strong>Nota:</strong> Deje en blanco para generar todas las combinaciones posibles.
-            </div>
-          </div>
-        </div>
-
-        <!-- Student Info -->
-        <div class="card shadow-sm mb-4 logic-card">
-          <div class="card-header bg-success text-white">
-            <h2 class="h5 mb-0"><i class="bi bi-person-badge"></i> Datos del Alumno</h2>
-          </div>
-          <div class="card-body">
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item"><strong>Nombre:</strong> Gabriel</li>
-              <li class="list-group-item"><strong>Curso:</strong> Lógica computacional</li>
-              <li class="list-group-item"><strong>Tema:</strong> Tablas de verdad</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <!-- Symbols and Info -->
-      <div class="col-lg-8 mx-auto">
-        <div class="row g-4">
-          <div class="col-md-6">
-            <div class="card shadow-sm h-100 logic-card">
-              <div class="card-header bg-warning text-dark">
-                <h2 class="h5 mb-0"><i class="bi bi-signpost-split"></i> Significados de los símbolos</h2>
-              </div>
-              <div class="card-body">
-                <div class="table-responsive">
-                  <table class="table table-hover">
-                    <thead class="table-light">
-                      <tr>
-                        <th>Símbolo</th>
-                        <th>Nombre</th>
-                        <th>Significado</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td class="symbol">¬</td>
-                        <td>Negación</td>
-                        <td>Cambia el valor de verdad</td>
-                      </tr>
-                      <tr>
-                        <td class="symbol">∧</td>
-                        <td>Conjunción</td>
-                        <td>"Y" lógico (ambas verdaderas)</td>
-                      </tr>
-                      <tr>
-                        <td class="symbol">∨</td>
-                        <td>Disyunción</td>
-                        <td>"O" lógico (al menos una verdadera)</td>
-                      </tr>
-                      <tr>
-                        <td class="symbol">→</td>
-                        <td>Implicación</td>
-                        <td>"Si... entonces..." (condicional)</td>
-                      </tr>
-                      <tr>
-                        <td class="symbol">↔</td>
-                        <td>Bicondicional</td>
-                        <td>"Si y solo si" (equivalencia)</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="col-md-6">
-            <div class="card shadow-sm h-100 logic-card">
-              <div class="card-header bg-info text-white">
-                <h2 class="h5 mb-0"><i class="bi bi-lightbulb"></i> Ejemplos de operaciones</h2>
-              </div>
-              <div class="card-body">
-                <div class="table-responsive">
-                  <table class="table table-hover">
-                    <thead class="table-light">
-                      <tr>
-                        <th>Operación</th>
-                        <th>Ejemplo</th>
-                        <th>Resultado</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>Negación</td>
-                        <td class="operation-example">¬V</td>
-                        <td><span class="truth-value false">F</span></td>
-                      </tr>
-                      <tr>
-                        <td>Conjunción</td>
-                        <td class="operation-example">V ∧ F</td>
-                        <td><span class="truth-value false">F</span></td>
-                      </tr>
-                      <tr>
-                        <td>Disyunción</td>
-                        <td class="operation-example">V ∨ F</td>
-                        <td><span class="truth-value true">V</span></td>
-                      </tr>
-                      <tr>
-                        <td>Implicación</td>
-                        <td class="operation-example">V → F</td>
-                        <td><span class="truth-value false">F</span></td>
-                      </tr>
-                      <tr>
-                        <td>Bicondicional</td>
-                        <td class="operation-example">V ↔ V</td>
-                        <td><span class="truth-value true">V</span></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div class="alert alert-secondary mt-3">
-                  <i class="bi bi-journal-text"></i> <strong>Observación:</strong> Este generador permite visualizar combinaciones lógicas básicas usando hasta cuatro proposiciones (P, Q, R, S).
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <i class="fas fa-paint-brush"></i>
+      <span>ArtCanvas Pro</span>
     </div>
+    <div class="navbar-nav">
+      <a href="#" class="nav-link active">
+        <i class="fas fa-home"></i>
+        <span>Inicio</span>
+      </a>
+      <a href="#" class="nav-link">
+        <i class="fas fa-image"></i>
+        <span>Galería</span>
+      </a>
+      <a href="#" class="nav-link">
+        <i class="fas fa-cog"></i>
+        <span>Ajustes</span>
+      </a>
+    </div>
+  </nav>
 
-    <!-- Result Section -->
-    <div class="row mt-4 d-none" id="result-section">
-      <div class="col-12">
-        <div class="card shadow">
-          <div class="card-header bg-primary text-white">
-            <h2 class="h4 mb-0"><i class="bi bi-table"></i> Tabla de Verdad Generada</h2>
-          </div>
-          <div class="card-body">
-            <div class="table-responsive">
-              <div id="tabla-container"></div>
-            </div>
-            <div class="d-grid gap-2 mt-3">
-              <button class="btn btn-outline-primary" onclick="volver()">
-                <i class="bi bi-arrow-left"></i> Volver
-              </button>
-            </div>
-          </div>
-        </div>
+  <!-- Contenido principal -->
+  <div class="container">
+    <div class="card">
+      <h1>
+        <i class="fas fa-palette"></i>
+        <span>Editor de Dibujo</span>
+      </h1>
+      
+      <div id="toolbar">
+        <button id="tool-circle" class="tool-btn active" data-tool="circle">
+          <i class="far fa-circle"></i>
+          <span>Círculo</span>
+        </button>
+          <button id="tool-circle" class="tool-btn active" data-tool="circle">
+          <i class="far fa-circle"></i>
+          <span>Círculo</span>
+        </button>
+
+          <button id="tool-text" class="tool-btn active" data-tool="circle">
+          <i class="far fa-circle"></i>
+          <span>Círculo</span>
+        </button>
+
+
+        <button id="tool-square" class="tool-btn" data-tool="square">
+          <i class="far fa-square"></i>
+          <span>Cuadrado</span>
+        </button>
+        <input type="color" id="color" value="#000000" title="Color">
+        <button id="clear" class="tool-btn danger">
+          <i class="fas fa-trash-alt"></i>
+          <span>Limpiar</span>
+        </button>
       </div>
+      
+      <canvas id="canvas" width="800" height="600"></canvas>
     </div>
   </div>
 
-  <!-- Bootstrap JS Bundle with Popper -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+      <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+      <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+    </div>
+    <p style="margin-top: 0.5rem; font-size: 0.875rem;">
+      &copy; 2023 ArtCanvas Pro. Todos los derechos reservados.
+    </p>
+  </footer>
+
   <script>
-    // Validación de entrada
-    function validarEntrada(valor) {
-      return valor === '' || valor.toUpperCase() === 'V' || valor.toUpperCase() === 'F';
-    }
+    document.addEventListener('DOMContentLoaded', () => {
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      const circleBtn = document.getElementById('tool-circle');
+      const squareBtn = document.getElementById('tool-square');
+      const colorPicker = document.getElementById('color');
+      const clearBtn = document.getElementById('clear');
+      const toolButtons = document.querySelectorAll('[data-tool]');
 
-    // Generar tabla de verdad
-    function generarTabla() {
-      // Obtener valores
-      const p = document.getElementById('p').value.toUpperCase();
-      const q = document.getElementById('q').value.toUpperCase();
-      const r = document.getElementById('r').value.toUpperCase();
-      const s = document.getElementById('s').value.toUpperCase();
-      
-      // Validar entradas
-      let valido = true;
-      const inputs = ['p', 'q', 'r', 's'];
-      
-      inputs.forEach(id => {
-        const input = document.getElementById(id);
-        const error = document.getElementById(`${id}-error`);
+      let currentTool = 'circle';
+      let currentColor = '#000000';
+      let isDrawing = false;
+      let startX = 0;
+      let startY = 0;
+      let shapes = [];
+      let selectedShape = null;
+      let isDragging = false;
+      let offsetX = 0;
+      let offsetY = 0;
+
+      // Inicializar canvas con fondo blanco
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = currentColor;
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      // Manejar selección de herramientas
+      toolButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          toolButtons.forEach(btn => btn.classList.remove('active'));
+          button.classList.add('active');
+          currentTool = button.dataset.tool;
+          selectedShape = null;
+          redrawCanvas();
+        });
+      });
+
+      colorPicker.addEventListener('change', e => {
+        currentColor = e.target.value;
+      });
+
+      clearBtn.addEventListener('click', clearCanvas);
+
+      canvas.addEventListener('mousedown', startDrawing);
+      canvas.addEventListener('mousemove', draw);
+      canvas.addEventListener('mouseup', stopDrawing);
+      canvas.addEventListener('mouseleave', () => {
+        isDrawing = false;
+        isDragging = false;
+      });
+
+      function startDrawing(e) {
+        const mouseX = e.offsetX;
+        const mouseY = e.offsetY;
         
-        if (!validarEntrada(input.value)) {
-          input.classList.add('is-invalid');
-          error.style.display = 'block';
-          valido = false;
-        } else {
-          input.classList.remove('is-invalid');
-          error.style.display = 'none';
-        }
-      });
-      
-      if (!valido) return;
-      
-      // Generar combinaciones
-      const combinaciones = generarCombinaciones(p, q, r, s);
-      
-      // Crear tabla HTML
-      let tablaHTML = `
-        <table class="table table-bordered table-hover">
-          <thead class="table-primary">
-            <tr>
-              <th>P</th>
-              <th>Q</th>
-              <th>R</th>
-              <th>S</th>
-              <th>¬P</th>
-              <th>¬Q</th>
-              <th>P ∧ Q</th>
-              <th>P ∨ Q</th>
-              <th>P → Q</th>
-              <th>P ↔ Q</th>
-            </tr>
-          </thead>
-          <tbody>
-      `;
-      
-      // Llenar tabla con datos
-      combinaciones.forEach(([P, Q, R, S]) => {
-        const rowClass = P === 'V' && Q === 'V' ? 'table-success' : '';
-        tablaHTML += `
-          <tr class="${rowClass}">
-            <td class="truth-value ${P === 'V' ? 'true' : 'false'}">${P}</td>
-            <td class="truth-value ${Q === 'V' ? 'true' : 'false'}">${Q}</td>
-            <td class="truth-value ${R === 'V' ? 'true' : 'false'}">${R}</td>
-            <td class="truth-value ${S === 'V' ? 'true' : 'false'}">${S}</td>
-            <td class="truth-value ${negacion(P) === 'V' ? 'true' : 'false'}">${negacion(P)}</td>
-            <td class="truth-value ${negacion(Q) === 'V' ? 'true' : 'false'}">${negacion(Q)}</td>
-            <td class="truth-value ${conjuncion(P, Q) === 'V' ? 'true' : 'false'}">${conjuncion(P, Q)}</td>
-            <td class="truth-value ${disyuncion(P, Q) === 'V' ? 'true' : 'false'}">${disyuncion(P, Q)}</td>
-            <td class="truth-value ${implicacion(P, Q) === 'V' ? 'true' : 'false'}">${implicacion(P, Q)}</td>
-            <td class="truth-value ${bicondicional(P, Q) === 'V' ? 'true' : 'false'}">${bicondicional(P, Q)}</td>
-          </tr>
-        `;
-      });
-      
-      tablaHTML += `</tbody></table>`;
-      
-      // Mostrar resultados
-      document.getElementById('tabla-container').innerHTML = tablaHTML;
-      document.getElementById('input-section').classList.add('d-none');
-      document.getElementById('result-section').classList.remove('d-none');
-      
-      // Scroll a resultados
-      document.getElementById('result-section').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    // Generar combinaciones posibles
-    function generarCombinaciones(p, q, r, s) {
-      const valores = ['V', 'F'];
-      const combinaciones = [];
-      
-      // Determinar qué variables tienen valores fijos
-      const pFijo = p !== '';
-      const qFijo = q !== '';
-      const rFijo = r !== '';
-      const sFijo = s !== '';
-      
-      // Generar combinaciones basadas en qué variables están fijas
-      for (const vp of pFijo ? [p] : valores) {
-        for (const vq of qFijo ? [q] : valores) {
-          for (const vr of rFijo ? [r] : valores) {
-            for (const vs of sFijo ? [s] : valores) {
-              combinaciones.push([vp, vq, vr, vs]);
-            }
+        // Verificar si se hizo clic en una forma existente
+        for (let i = shapes.length - 1; i >= 0; i--) {
+          const shape = shapes[i];
+          if (isPointInShape(mouseX, mouseY, shape)) {
+            selectedShape = shape;
+            isDragging = true;
+            offsetX = mouseX - shape.x;
+            offsetY = mouseY - shape.y;
+            redrawCanvas();
+            return;
           }
         }
+        
+        // Si no se seleccionó una forma, comenzar a dibujar una nueva
+        isDrawing = true;
+        startX = mouseX;
+        startY = mouseY;
+        selectedShape = null;
       }
-      
-      return combinaciones;
-    }
 
-    // Operaciones lógicas
-    function negacion(valor) {
-      return valor === 'V' ? 'F' : 'V';
-    }
-
-    function conjuncion(a, b) {
-      return a === 'V' && b === 'V' ? 'V' : 'F';
-    }
-
-    function disyuncion(a, b) {
-      return a === 'V' || b === 'V' ? 'V' : 'F';
-    }
-
-    function implicacion(a, b) {
-      return a === 'V' && b === 'F' ? 'F' : 'V';
-    }
-
-    function bicondicional(a, b) {
-      return a === b ? 'V' : 'F';
-    }
-
-    // Volver al formulario
-    function volver() {
-      document.getElementById('input-section').classList.remove('d-none');
-      document.getElementById('result-section').classList.add('d-none');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    // Validación en tiempo real
-    document.querySelectorAll('input').forEach(input => {
-      input.addEventListener('input', function() {
-        if (this.value !== '' && !validarEntrada(this.value)) {
-          this.classList.add('is-invalid');
-          document.getElementById(`${this.id}-error`).style.display = 'block';
-        } else {
-          this.classList.remove('is-invalid');
-          document.getElementById(`${this.id}-error`).style.display = 'none';
+      function draw(e) {
+        const mouseX = e.offsetX;
+        const mouseY = e.offsetY;
+        
+        if (isDragging && selectedShape) {
+          // Mover la forma seleccionada
+          selectedShape.x = mouseX - offsetX;
+          selectedShape.y = mouseY - offsetY;
+          redrawCanvas();
+        } else if (isDrawing) {
+          // Dibujar la forma temporal mientras se arrastra
+          redrawCanvas();
+          drawTempShape(startX, startY, mouseX, mouseY);
         }
-      });
+      }
+
+      function stopDrawing(e) {
+        const mouseX = e.offsetX;
+        const mouseY = e.offsetY;
+        
+        if (isDragging) {
+          isDragging = false;
+          return;
+        }
+
+        if (isDrawing) {
+          isDrawing = false;
+          
+          // Guardar la nueva forma
+          const shape = {
+            type: currentTool,
+            x: startX,
+            y: startY,
+            width: mouseX - startX,
+            height: mouseY - startY,
+            color: currentColor
+          };
+          
+          // Para círculos, usamos el radio
+          if (currentTool === 'circle') {
+            shape.radius = Math.sqrt(Math.pow(shape.width, 2) + Math.pow(shape.height, 2));
+            delete shape.width;
+            delete shape.height;
+          }
+          
+          shapes.push(shape);
+          redrawCanvas();
+        }
+      }
+
+      function isPointInShape(x, y, shape) {
+        if (shape.type === 'circle') {
+          const distance = Math.sqrt(Math.pow(x - shape.x, 2) + Math.pow(y - shape.y, 2));
+          return distance <= shape.radius;
+        } else { // square
+          return x >= shape.x && x <= shape.x + shape.width &&
+                 y >= shape.y && y <= shape.y + shape.height;
+        }
+      }
+
+      function drawTempShape(x1, y1, x2, y2) {
+        ctx.strokeStyle = currentColor;
+        ctx.lineWidth = 2;
+        
+        if (currentTool === 'circle') {
+          const radius = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+          ctx.beginPath();
+          ctx.arc(x1, y1, radius, 0, Math.PI * 2);
+          ctx.stroke();
+        } else { // square
+          ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+        }
+      }
+
+      function redrawCanvas() {
+        // Limpiar canvas
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Dibujar todas las formas
+        shapes.forEach(shape => {
+          ctx.strokeStyle = shape.color;
+          ctx.lineWidth = 2;
+          
+          if (shape.type === 'circle') {
+            ctx.beginPath();
+            ctx.arc(shape.x, shape.y, shape.radius, 0, Math.PI * 2);
+            ctx.stroke();
+          } else { // square
+            ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
+          }
+          
+          // Resaltar la forma seleccionada
+          if (shape === selectedShape) {
+            ctx.strokeStyle = '#FF0000';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([5, 5]);
+            
+            if (shape.type === 'circle') {
+              ctx.beginPath();
+              ctx.arc(shape.x, shape.y, shape.radius, 0, Math.PI * 2);
+              ctx.stroke();
+            } else {
+              ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
+            }
+            
+            ctx.setLineDash([]);
+          }
+        });
+      }
+
+      function clearCanvas() {
+        shapes = [];
+        selectedShape = null;
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
     });
   </script>
 </body>
