@@ -48,12 +48,84 @@
 <body class="bg-light">
   <div class="container py-5">
     <!-- Header -->
-    <header class="text-center mb-5">
+<header style="margin-top: -48px; height: 36px;">
+  <nav>
+    <ol class="menu">
+      <li><a href="./index.html">Inicio</a></li>
+      <li><a href="./index.html">Pizarra</a></li>
+      <li><a href="./index1.html">Mate</a></li>
+    </ol>
+  </nav>
+</header>
+
+<style>
+  /* Reset básico */
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f4f8;
+  }
+
+  header {
+    background: #2a9df4; /* azul */
+    padding: 5px 0;
+  }
+
+  nav {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .menu {
+    list-style: none;
+    display: flex;
+    justify-content: center; /* centro horizontal */
+    gap: 40px;
+    padding: 0;
+    margin: 0;
+  }
+
+  .menu li a {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .menu li a:hover,
+  .menu li a:focus {
+    background-color: #1e7adf;
+    color: #ffe;
+    outline: none;
+  }
+
+  /* Responsive: en pantallas pequeñas se vuelve vertical */
+  @media (max-width: 480px) {
+    .menu {
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .menu li a {
+      font-size: 1.3rem;
+      padding: 10px 16px;
+      width: 100%;
+      text-align: center;
+      max-width: 200px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+  }
+</style>
+    <div class="text-center mb-5">
       <h1 class="display-4 fw-bold text-primary">
         <i class="bi bi-table"></i> Generador de Tabla de Verdad
       </h1>
       <p class="lead">Herramienta para análisis de proposiciones lógicas</p>
-    </header>
+    </div>
 
     <div class="row">
       <!-- Input Section -->

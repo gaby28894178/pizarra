@@ -4,14 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Editor de Dibujo Avanzado</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       padding: 20px;
       background-color: #f3f4f6;
-    }
+      display: flex;
+      flex-direction: column;
+    } 
     #toolbar {
       display: flex;
       gap: 10px;
@@ -19,42 +21,122 @@
       flex-wrap: wrap;
     }
     .tool-btn {
-      padding: 8px 12px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      background: white;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 5px;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        user-select: none;
     }
     .tool-btn.active {
-      background: #3b82f6;
-      color: white;
-      border-color: #3b82f6;
+        background: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
     }
     canvas {
-      border: 1px solid #ddd;
-      background-color: white;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border: 1px solid #ddd;
+        background-color: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: block;
+        margin-top: 10px;
     }
     #text-input-container {
-      position: absolute;
-      display: none;
-      background: white;
-      padding: 5px;
-      border: 2px solid #3b82f6;
-      border-radius: 4px;
-      z-index: 100;
+        position: absolute;
+        display: none;
+        background: white;
+        padding: 2px;
+        border: 2px solid #3b82f6;
+        border-radius: 4px;
+        z-index: 100;
     }
     #text-input {
-      border: 1px solid #ddd;
-      padding: 5px;
-      width: 200px;
+        border: 1px solid #ddd;
+        padding: 5px;
+        width: 200px;
+        font-size: 16px;
+        
     }
   </style>
 </head>
 <body>
+<header style="margin-top: -22px; height: 12px;">
+  <nav>
+    <ol class="menu">
+      <li><a href="./index.html">Inicio</a></li>
+      <li><a href="./pizarra2.html">Pizarra</a></li>
+      <li><a href="./index1.html">Mate</a></li>
+    </ol>
+  </nav>
+</header>
+
+<style>
+  /* Reset básico */
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f4f8;
+  }
+
+  header {
+    background: #2a9df4; /* azul */
+    padding: 15px 0;
+  }
+
+  nav {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .menu {
+    list-style: none;
+    display: flex;
+    justify-content: center; /* centro horizontal */
+    gap: 40px;
+    padding: 0;
+    margin: 0;
+  }
+
+  .menu li a {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .menu li a:hover,
+  .menu li a:focus {
+    background-color: #1e7adf;
+    color: #ffe;
+    outline: none;
+  }
+
+  /* Responsive: en pantallas pequeñas se vuelve vertical */
+  @media (max-width: 480px) {
+    .menu {
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .menu li a {
+      font-size: 1.3rem;
+      padding: 10px 16px;
+      width: 100%;
+      text-align: center;
+      max-width: 200px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+  }
+</style>
+
+
+
   <h1><i class="fas fa-paint-brush"></i> Editor de Dibujo</h1>
   
   <div id="toolbar">
@@ -64,12 +146,12 @@
     <button class="tool-btn" data-tool="triangle"><i class="fas fa-play"></i> Triángulo</button>
     <button class="tool-btn" data-tool="arrow"><i class="fas fa-arrow-right"></i> Flecha</button>
     <button class="tool-btn" data-tool="text"><i class="fas fa-font"></i> Texto</button>
-    <input type="color" id="color" value="#000000">
+    <input type="color" id="color" value="#000000" title="Color de dibujo" />
     <button id="clear" class="tool-btn"><i class="fas fa-trash-alt"></i> Limpiar</button>
   </div>
   
   <div id="text-input-container">
-    <input type="text" id="text-input" placeholder="Escribe tu texto...">
+    <input type="text" id="text-input" placeholder="Escribe tu texto..." />
   </div>
   
   <canvas id="canvas" width="800" height="600"></canvas>
@@ -93,6 +175,7 @@
     let offsetX, offsetY;
     let textPosition = { x: 0, y: 0 };
 
+    // Cambiar herramienta
     toolButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         toolButtons.forEach(b => b.classList.remove('active'));
@@ -102,21 +185,25 @@
       });
     });
 
+    // Cambiar color
     colorPicker.addEventListener('input', (e) => {
       currentColor = e.target.value;
     });
 
+    // Limpiar canvas
     clearBtn.addEventListener('click', () => {
       shapes = [];
       deselectShape();
       redrawCanvas();
     });
 
+    // Eventos de canvas
     canvas.addEventListener('mousedown', handleMouseDown);
     canvas.addEventListener('mousemove', handleMouseMove);
     canvas.addEventListener('mouseup', handleMouseUp);
     canvas.addEventListener('mouseleave', handleMouseUp);
 
+    // Manejo input texto
     textInput.addEventListener('keyup', (e) => {
       if (e.key === 'Enter') {
         addText();
@@ -125,26 +212,30 @@
       }
     });
 
+    // Deseleccionar forma con ESC
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') deselectShape();
     });
 
+    // Deseleccionar forma
     function deselectShape() {
       selectedShape = null;
       isDragging = false;
       redrawCanvas();
     }
 
+    // Mouse down en canvas
     function handleMouseDown(e) {
       const mouseX = e.offsetX;
       const mouseY = e.offsetY;
 
+      // Comprobar si se clickea una forma para mover
       for (let i = shapes.length - 1; i >= 0; i--) {
         if (isPointInShape(mouseX, mouseY, shapes[i])) {
           selectedShape = shapes[i];
           isDragging = true;
-          offsetX = mouseX - (selectedShape.x || selectedShape.posX || selectedShape.startX || 0);
-          offsetY = mouseY - (selectedShape.y || selectedShape.posY || selectedShape.startY || 0);
+          offsetX = mouseX - (selectedShape.x ?? selectedShape.posX ?? selectedShape.startX ?? 0);
+          offsetY = mouseY - (selectedShape.y ?? selectedShape.posY ?? selectedShape.startY ?? 0);
           return;
         }
       }
@@ -154,6 +245,7 @@
       startY = mouseY;
       isDrawing = true;
 
+      // Para texto abrir input
       if (currentTool === 'text') {
         textPosition = { x: mouseX, y: mouseY };
         showTextInput(mouseX, mouseY);
@@ -161,6 +253,7 @@
       }
     }
 
+    // Mouse move en canvas
     function handleMouseMove(e) {
       const mouseX = e.offsetX;
       const mouseY = e.offsetY;
@@ -186,7 +279,6 @@
           selectedShape.x = dx;
           selectedShape.y = dy;
         }
-
         redrawCanvas();
       } else if (isDrawing) {
         redrawCanvas();
@@ -194,7 +286,8 @@
       }
     }
 
-    function handleMouseUp() {
+    // Mouse up en canvas
+    function handleMouseUp(e) {
       if (isDragging) {
         isDragging = false;
         return;
@@ -202,8 +295,8 @@
 
       if (isDrawing) {
         isDrawing = false;
-        const mouseX = event.offsetX;
-        const mouseY = event.offsetY;
+        const mouseX = e.offsetX;
+        const mouseY = e.offsetY;
 
         if (Math.abs(mouseX - startX) > 5 || Math.abs(mouseY - startY) > 5) {
           const shape = createShape(startX, startY, mouseX, mouseY);
@@ -214,6 +307,7 @@
       }
     }
 
+    // Crear forma con datos
     function createShape(x1, y1, x2, y2) {
       const shape = {
         type: currentTool,
@@ -239,125 +333,191 @@
         case 'text':
           shape.posX = x1;
           shape.posY = y1;
-          shape.text = textInput.value;
+          shape.text = textInput.value.trim();
           break;
       }
       return shape;
     }
 
+    // Dibujar forma temporal al arrastrar
     function drawTempShape(x1, y1, x2, y2) {
       ctx.strokeStyle = currentColor;
+      ctx.fillStyle = currentColor;
       ctx.lineWidth = 2;
-      ctx.beginPath();
 
-      switch (currentTool) {
+      switch(currentTool) {
         case 'line':
-          ctx.moveTo(x1, y1);
-          ctx.lineTo(x2, y2);
-          break;
-        case 'square':
-          ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
-          break;
-        case 'circle':
-          const radius = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
-          ctx.arc(x1, y1, radius, 0, Math.PI * 2);
-          break;
-        case 'triangle':
-          ctx.moveTo(x1 + (x2 - x1) / 2, y1);
-          ctx.lineTo(x2, y2);
-          ctx.lineTo(x1, y2);
-          ctx.closePath();
+          drawLine(x1, y1, x2, y2);
           break;
         case 'arrow':
-          ctx.moveTo(x1, y1);
-          ctx.lineTo(x2, y2);
+          drawArrow(x1, y1, x2, y2);
+          break;
+        case 'square':
+          drawSquare(x1, y1, x2 - x1, y2 - y1);
+          break;
+        case 'circle':
+          const radius = Math.sqrt((x2 - x1)**2 + (y2 - y1)**2);
+          drawCircle(x1, y1, radius);
+          break;
+        case 'triangle':
+          drawTriangle(x1, y1, x2, y2);
           break;
       }
-      ctx.stroke();
     }
 
+    // Redibujar todo
     function redrawCanvas() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = 'white';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
       shapes.forEach(shape => {
         ctx.strokeStyle = shape.color;
         ctx.fillStyle = shape.color;
         ctx.lineWidth = 2;
-        ctx.beginPath();
-        switch (shape.type) {
+
+        if (shape === selectedShape) {
+          ctx.shadowColor = 'rgba(59, 130, 246, 0.7)';
+          ctx.shadowBlur = 10;
+        } else {
+          ctx.shadowBlur = 0;
+        }
+
+        switch(shape.type) {
           case 'line':
-            ctx.moveTo(shape.x, shape.y);
-            ctx.lineTo(shape.endX, shape.endY);
+            drawLine(shape.x, shape.y, shape.endX, shape.endY);
             break;
           case 'arrow':
-            ctx.moveTo(shape.x, shape.y);
-            ctx.lineTo(shape.endX, shape.endY);
+            drawArrow(shape.x, shape.y, shape.endX, shape.endY);
             break;
           case 'square':
-            ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
-            break;
-          case 'triangle':
-            ctx.moveTo(shape.x + shape.width / 2, shape.y);
-            ctx.lineTo(shape.x + shape.width, shape.y + shape.height);
-            ctx.lineTo(shape.x, shape.y + shape.height);
-            ctx.closePath();
+            drawSquare(shape.x, shape.y, shape.width, shape.height);
             break;
           case 'circle':
-            ctx.arc(shape.x, shape.y, shape.radius, 0, Math.PI * 2);
+            drawCircle(shape.x, shape.y, shape.radius);
+            break;
+          case 'triangle':
+            drawTriangle(shape.x, shape.y, shape.x + shape.width, shape.y + shape.height);
             break;
           case 'text':
-            ctx.font = '16px Arial';
-            ctx.fillText(shape.text, shape.posX, shape.posY);
+            drawText(shape.posX, shape.posY, shape.text, shape.color);
             break;
         }
-        ctx.stroke();
+        ctx.shadowBlur = 0;
       });
     }
 
+    // Funciones dibujo
+
+    function drawLine(x1, y1, x2, y2) {
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    }
+
+    function drawArrow(x1, y1, x2, y2) {
+      const headlen = 10;
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const angle = Math.atan2(dy, dx);
+
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - headlen * Math.cos(angle - Math.PI / 6), y2 - headlen * Math.sin(angle - Math.PI / 6));
+      ctx.lineTo(x2 - headlen * Math.cos(angle + Math.PI / 6), y2 - headlen * Math.sin(angle + Math.PI / 6));
+      ctx.lineTo(x2, y2);
+      ctx.fill();
+    }
+
+    function drawSquare(x, y, width, height) {
+      ctx.beginPath();
+      ctx.rect(x, y, width, height);
+      ctx.stroke();
+    }
+
+    function drawCircle(x, y, radius) {
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    function drawTriangle(x1, y1, x2, y2) {
+      ctx.beginPath();
+      ctx.moveTo(x1, y2);
+      ctx.lineTo((x1 + x2) / 2, y1);
+      ctx.lineTo(x2, y2);
+      ctx.closePath();
+      ctx.stroke();
+    }
+
+    function drawText(x, y, text, color) {
+      ctx.fillStyle = color;
+      ctx.font = '20px Arial';
+      ctx.fillText(text, x, y);
+    }
+
+    // Mostrar input texto para agregar
     function showTextInput(x, y) {
       textInputContainer.style.display = 'block';
-      textInputContainer.style.left = x + 'px';
-      textInputContainer.style.top = y + 'px';
+      textInputContainer.style.left = `${x}px`;
+      textInputContainer.style.top = `${y}px`;
       textInput.value = '';
       textInput.focus();
     }
 
+    // Agregar texto a shapes y ocultar input
     function addText() {
       const text = textInput.value.trim();
-      if (!text) return;
-      shapes.push({
-        type: 'text',
-        posX: textPosition.x,
-        posY: textPosition.y,
-        color: currentColor,
-        text
-      });
+      if (text) {
+        shapes.push({
+          type: 'text',
+          posX: textPosition.x,
+          posY: textPosition.y,
+          text: text,
+          color: currentColor
+        });
+        redrawCanvas();
+      }
       textInputContainer.style.display = 'none';
-      redrawCanvas();
     }
 
+    // Detectar si un punto está dentro de una forma para selección (simplificado)
     function isPointInShape(x, y, shape) {
-      switch (shape.type) {
-        case 'text':
-          return (x >= shape.posX && x <= shape.posX + 100 && y >= shape.posY - 16 && y <= shape.posY);
-        case 'circle':
-          const dx = x - shape.x;
-          const dy = y - shape.y;
-          return dx * dx + dy * dy <= shape.radius * shape.radius;
-        case 'square':
-        case 'triangle':
-          return x >= shape.x && x <= shape.x + shape.width && y >= shape.y && y <= shape.y + shape.height;
+      ctx.beginPath();
+      switch(shape.type) {
         case 'line':
-        case 'arrow':
+          // área alrededor de línea para facilitar selección
+          const buffer = 6;
           const dist = pointToLineDistance(x, y, shape.x, shape.y, shape.endX, shape.endY);
-          return dist < 6;
+          return dist < buffer;
+        case 'arrow':
+          // igual que línea para simplificar
+          return isPointInShape(x, y, {...shape, type:'line'});
+        case 'square':
+          return x >= shape.x && x <= shape.x + shape.width && y >= shape.y && y <= shape.y + shape.height;
+        case 'circle':
+          const distCircle = Math.sqrt((x - shape.x)**2 + (y - shape.y)**2);
+          return distCircle <= shape.radius;
+        case 'triangle':
+          // Usamos función para punto dentro de triángulo
+          const x1 = shape.x, y1 = shape.y + shape.height;
+          const x2 = shape.x + shape.width / 2, y2 = shape.y;
+          const x3 = shape.x + shape.width, y3 = shape.y + shape.height;
+          return pointInTriangle({x, y}, {x:x1,y:y1}, {x:x2,y:y2}, {x:x3,y:y3});
+        case 'text':
+          ctx.font = '20px Arial';
+          const width = ctx.measureText(shape.text).width;
+          const height = 20;
+          return x >= shape.posX && x <= shape.posX + width && y <= shape.posY && y >= shape.posY - height;
         default:
           return false;
       }
     }
 
+    // Distancia punto a línea (usado para selección)
     function pointToLineDistance(px, py, x1, y1, x2, y2) {
       const A = px - x1;
       const B = py - y1;
@@ -365,17 +525,21 @@
       const D = y2 - y1;
 
       const dot = A * C + B * D;
-      const lenSq = C * C + D * D;
-      const param = lenSq !== 0 ? dot / lenSq : -1;
+      const len_sq = C * C + D * D;
+      let param = -1;
+      if (len_sq !== 0) param = dot / len_sq;
 
       let xx, yy;
+
       if (param < 0) {
         xx = x1;
         yy = y1;
-      } else if (param > 1) {
+      }
+      else if (param > 1) {
         xx = x2;
         yy = y2;
-      } else {
+      }
+      else {
         xx = x1 + param * C;
         yy = y1 + param * D;
       }
@@ -385,8 +549,19 @@
       return Math.sqrt(dx * dx + dy * dy);
     }
 
-    // Inicializar
-    redrawCanvas();
+    // Punto dentro de triángulo (usando área)
+    function pointInTriangle(p, p0, p1, p2) {
+      const A = area(p0, p1, p2);
+      const A1 = area(p, p1, p2);
+      const A2 = area(p0, p, p2);
+      const A3 = area(p0, p1, p);
+      return Math.abs(A - (A1 + A2 + A3)) < 0.5;
+    }
+
+    function area(a, b, c) {
+      return Math.abs((a.x*(b.y-c.y) + b.x*(c.y-a.y) + c.x*(a.y-b.y)) / 2.0);
+    }
+
   </script>
 </body>
 </html>
